@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Document{% endblock %}</title>
+     {% load static %}
+    <link rel="stylesheet" href="../../static/style.css">
+</head>
+<body>
+  <header>
+    <div>
+          <a href="">Main</a>
+          {% if User.is_authenticated %}
+            <a href="">Create_Project</a>
+            <a href="">My_projects</a>
+          {% endif %}
+      </div>
+      <div>
+          {% if User.is_authenticated %}
+            <a href="logged_out">Logout</a>
+          {% else %}
+            <a href="{% url 'login' %}">Login</a>
+          {% endif %}
+          <a href="{% url 'register' %}">Register</a>
+      </div>
+  </header>
+  {% block content %}{% endblock %}
+</body>
+</html>
