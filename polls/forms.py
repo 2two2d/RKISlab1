@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import EmailValidator
 from django.core.validators import RegexValidator, FileExtensionValidator
-from django.contrib.auth.models import User
+from .models import User
 
 class UserRegistrationForm(forms.ModelForm):
     username = forms.CharField(label='Username', widget=forms.TextInput,
@@ -18,7 +18,7 @@ class UserRegistrationForm(forms.ModelForm):
     email = forms.EmailField(label='Email', widget=forms.EmailInput, required=True,
                              validators=[EmailValidator('Email не верен')])
     avatar = forms.ImageField(label="Pic an avatar", validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'bmp'])],
-                              required=True)
+                              required=False)
     checkbox = forms.CharField(label='Privet information permission', widget=forms.CheckboxInput,
                                required=False)
 
@@ -34,7 +34,10 @@ class UserRegistrationForm(forms.ModelForm):
 
     def clean_checkbox(self):
         cd = self.cleaned_data
-        print(cd['checkbox'])
         if cd['checkbox'] == False:
             raise forms.ValidationError('Подтвердите обработку персональных данных')
         return cd['checkbox']
+
+    def clean_img(self):
+        avatar = self.cleaned_data['avatar']
+        return avatar

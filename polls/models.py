@@ -23,3 +23,21 @@ class Choice(models.Model):
 
     def __str__(self):
         return self.choice_text
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    id = models.AutoField(primary_key=True, unique=True)
+    full_name = models.CharField(max_length=50, help_text="Напишите ФИО")
+    username = models.CharField(max_length=50, unique=True)
+    password = models.CharField(max_length=200)
+    email = models.EmailField(unique=True, max_length=254)
+    is_staff = models.BooleanField(default=False)
+    avatar = models.ImageField(null=True, blank=True, upload_to="images/profile")
+
+    USERNAME_FIELD = 'username'  # Идентификатор для обращения
+    REQUIRED_FIELDS = ['email']  # Список имён полей для Superuser
+
+    objects = UserManager()
+
+    def __str__(self):
+        return self.full_name

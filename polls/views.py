@@ -1,23 +1,38 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Question, Choice
+from .models import Question, Choice, User
 from django.template import loader
 from django.urls import reverse
 from django.views import generic
 from .forms import UserRegistrationForm
+from django.urls import reverse_lazy
+# def register(request):
+#     if request.method == 'POST':
+#         form = UserRegistrationForm(request.POST)
+#         if form.is_valid():
+#             new_user = form.save(commit=False)
+#             new_user.set_password(form.cleaned_data['password'])
+#             new_user.avatar = form.cleaned_data['avatar']
+#             new_user.save()
+#             return render(request, 'registration/register_done.html', {'new_user':new_user})
+#     else:
+#         form = UserRegistrationForm()
+#
+#     return render(request, 'registration/register.html', {'form':form})
 
-def register(request):
-    if request.method == 'POST':
-        user_form = UserRegistrationForm(request.POST)
-        if user_form.is_valid():
-            new_user = user_form.save(commit=False)
-            new_user.set_password(user_form.cleaned_data['password'])
-            new_user.save()
-            return render(request, 'registration/register_done.html', {'new_user': new_user})
+class register(generic.CreateView):
+    model = User
+    template_name = 'registration/register.html'
+    fields = ()
+    form = UserRegistrationForm()
+    success_url = reverse_lazy('index')
 
-    else:
-        user_form = UserRegistrationForm()
-    return render(request, 'registration/register.html', {'user_form': user_form})
+    def form_valid(self):
+        form = UserRegistrationForm()
+        fields = form.save(commit=True)
+        fields.save()
+        return super().form_valid(form)
+
 
 def logged_out(request):
     return render(request, 'registration/logged_out.html')
