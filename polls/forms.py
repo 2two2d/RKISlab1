@@ -24,7 +24,7 @@ class UserRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('avatar', 'full_name', 'username', 'email', 'password', 'password2')
+        fields = ['avatar', 'full_name', 'username', 'email', 'password', 'password2']
 
     def clean_password2(self):
         cd = self.cleaned_data
@@ -40,4 +40,6 @@ class UserRegistrationForm(forms.ModelForm):
 
     def clean_img(self):
         avatar = self.cleaned_data['avatar']
+        if avatar == None:
+            avatar = '/media/images/profile/grey_avatar.png'
         return avatar

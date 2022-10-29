@@ -23,22 +23,13 @@ from django.urls import reverse_lazy
 class register(generic.CreateView):
     model = User
     template_name = 'registration/register.html'
-    fields = ()
-    form = UserRegistrationForm()
+    form_class = UserRegistrationForm
     success_url = reverse_lazy('index')
 
-    def form_valid(self):
-        form = UserRegistrationForm()
+    def form_valid(self, form):
         fields = form.save(commit=True)
         fields.save()
         return super().form_valid(form)
-
-
-def logged_out(request):
-    return render(request, 'registration/logged_out.html')
-
-def login(request):
-    return render(request, 'registration/login.html')
 
 
 class IndexView(generic.ListView):
