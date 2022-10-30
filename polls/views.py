@@ -1,40 +1,37 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
+from .forms import AuthenticationForm
+from django.contrib.auth.views import LoginView
 from .models import Question, Choice, User
 from django.template import loader
 from django.urls import reverse
 from django.views import generic
 from .forms import UserRegistrationForm
 from django.urls import reverse_lazy
-# def register(request):
-#     if request.method == 'POST':
-#         form = UserRegistrationForm(request.POST)
-#         if form.is_valid():
-#             new_user = form.save(commit=False)
-#             new_user.set_password(form.cleaned_data['password'])
-#             new_user.avatar = form.cleaned_data['avatar']
-#             new_user.save()
-#             return render(request, 'registration/register_done.html', {'new_user':new_user})
-#     else:
-#         form = UserRegistrationForm()
-#
-#     return render(request, 'registration/register.html', {'form':form})
+def register(request):
+    if request.method == 'POST':
+         form = UserRegistrationForm(request.POST)
+         if form.is_valid():
+             new_user = form.save(commit=False)
+             new_user.set_password(form.cleaned_data['password'])
+             new_user.avatar = form.cleaned_data['avatar']
+             new_user.save()
+             return render(request, 'usermanagment/register_done.html', {'new_user':new_user})
+    else:
+         form = UserRegistrationForm()
 
-class register(generic.CreateView):
-    model = User
-    template_name = 'registration/register.html'
-    form_class = UserRegistrationForm
-    success_url = reverse_lazy('index')
+    return render(request, 'usermanagment/register.html', {'form':form})
 
-    def form_valid(self, form):
-        fields = form.save(commit=True)
-        fields.save()
-        return super().form_valid(form)
 
+
+def login(request):
+
+    if request.method == 'POST':
+        user = request.POST['name']
 
 class IndexView(generic.ListView):
     template_name = 'polls/index.html'
-    context_object_name = 'latest_question_list'
+    context_object_name = 'usermanagment/login.html'
 
     def get_queryset(self):
         return Question.objects.order_by('-pub_date')

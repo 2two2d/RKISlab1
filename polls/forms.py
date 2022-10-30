@@ -38,8 +38,18 @@ class UserRegistrationForm(forms.ModelForm):
             raise forms.ValidationError('Подтвердите обработку персональных данных')
         return cd['checkbox']
 
-    def clean_img(self):
-        avatar = self.cleaned_data['avatar']
-        if avatar == None:
-            avatar = '/media/images/profile/grey_avatar.png'
-        return avatar
+    def clean_avatar(self):
+        cd = self.cleaned_data
+        #if avatar == None:
+         #   avatar = '/media/images/profile/grey_avatar.png'
+        return cd['avatar']
+
+class AuthenticationForm(forms.ModelForm):
+    username = forms.CharField(label='Username', widget=forms.TextInput,
+                               validators=[RegexValidator(r'[a-zA-Z\-]', 'В логине доступны только латинские символы')],
+                               required=True)
+    password = forms.CharField(label='Password', widget=forms.PasswordInput, required=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'password']
