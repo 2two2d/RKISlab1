@@ -40,8 +40,8 @@ class UserRegistrationForm(forms.ModelForm):
 
     def clean_avatar(self):
         cd = self.cleaned_data
-        #if avatar == None:
-         #   avatar = '/media/images/profile/grey_avatar.png'
+        if cd['avatar'] == None:
+           cd['avatar'] = '/media/images/profile/grey_avatar.png'
         return cd['avatar']
 
 class AuthenticationForm(forms.ModelForm):

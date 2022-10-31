@@ -8,9 +8,11 @@ from django.urls import reverse
 from django.views import generic
 from .forms import UserRegistrationForm
 from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 def register(request):
     if request.method == 'POST':
-         form = UserRegistrationForm(request.POST)
+         form = UserRegistrationForm(request.POST, request.FILES)
          if form.is_valid():
              new_user = form.save(commit=False)
              new_user.set_password(form.cleaned_data['password'])
@@ -22,12 +24,14 @@ def register(request):
 
     return render(request, 'usermanagment/register.html', {'form':form})
 
-
-
-def login(request):
-
-    if request.method == 'POST':
-        user = request.POST['name']
+@login_required
+def my_profile(request):
+    current_user = request.user
+    return render(request, 'usermanagment/my_profile.html', {'user':current_user})
+@login_required
+def UserDelete(request):
+    request.user.delete()
+    return render(request, 'usermanagment/user_deleted.html')
 
 class IndexView(generic.ListView):
     template_name = 'polls/index.html'
