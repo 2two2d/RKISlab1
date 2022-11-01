@@ -40,16 +40,32 @@ class UserRegistrationForm(forms.ModelForm):
 
     def clean_avatar(self):
         cd = self.cleaned_data
-        if cd['avatar'] == None:
-           cd['avatar'] = '/media/images/profile/grey_avatar.png'
+        if not cd['avatar']:
+           cd['avatar'] = '/images/profile/grey_avatar.png'
         return cd['avatar']
 
-class AuthenticationForm(forms.ModelForm):
+class UserUpdateForm(forms.ModelForm):
     username = forms.CharField(label='Username', widget=forms.TextInput,
                                validators=[RegexValidator(r'[a-zA-Z\-]', 'В логине доступны только латинские символы')],
                                required=True)
-    password = forms.CharField(label='Password', widget=forms.PasswordInput, required=True)
 
+    full_name = forms.CharField(label='ФИО', widget=forms.TextInput,
+                                validators=[RegexValidator(r'[а-яА-ЯёЁ\-\s]',
+                                                           'В ФИО доступна только кириллица, пробелы и дефис')],
+                                required=True)
+    email = forms.EmailField(label='Email', widget=forms.EmailInput, required=True,
+                             validators=[EmailValidator('Email не верен')])
+    avatar = forms.ImageField(label="Pic an avatar",
+                              validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'bmp'])],
+                              required=False)
+
+    password_check = forms.CharField(label='varify_your_password', widget=forms.PasswordInput, required=True)
+
+    def clean_avatar(self):
+        cd = self.cleaned_data
+        if not cd['avatar']:
+           cd['avatar'] = '/images/profile/grey_avatar.png'
+        return cd['avatar']
     class Meta:
         model = User
-        fields = ['username', 'password']
+        fields = ['avatar', 'full_name', 'username', 'email', 'password_check']

@@ -1,18 +1,17 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
-from .forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
 from .models import Question, Choice, User
 from django.template import loader
 from django.urls import reverse
 from django.views import generic
-from .forms import UserRegistrationForm
+from .forms import UserRegistrationForm, UserUpdateForm
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 def register(request):
     if request.method == 'POST':
-         form = UserRegistrationForm(request.POST, request.FILES)
+         form = UserRegistrationForm(request.POST, request.FILES, request)
          if form.is_valid():
              new_user = form.save(commit=False)
              new_user.set_password(form.cleaned_data['password'])
@@ -20,9 +19,28 @@ def register(request):
              new_user.save()
              return render(request, 'usermanagment/register_done.html', {'new_user':new_user})
     else:
-         form = UserRegistrationForm()
+         form = UserRegistrationForm(request)
 
     return render(request, 'usermanagment/register.html', {'form':form})
+
+def update_user(request):
+    if request.method == 'POST':
+        form = UserUpdateForm(request.POST, request.FILES)
+        if form.is_valid():
+            if form.password_check == request.user.password:
+                user = User.objects.filter(id=request.user.id)
+                user.full_name = form.full_name
+                user.username = form.username
+                user.mail = form.mail
+                user.avatar = form.cleaned_data['avatar']
+                user.save()
+
+                return render(request, 'usermanagment/register_done.html')
+    else:
+        form = UserUpdateForm(initial={'full_name': request.user.full_name, 'username': request.user.username, 'email': request.user.email})
+
+    return render(request, 'usermanagment/user_update.html', {'form': form})
+
 
 @login_required
 def my_profile(request):

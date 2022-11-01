@@ -11,5 +11,6 @@ urlpatterns = [
     path(r'^<int:pk>/$', views.DetailView.as_view(), name='detail'),
     path(r'^<int:pk>/results/$', views.ResultsView.as_view(), name='results'),
     path(r'^<int:question_id>/vote/$', views.vote, name='vote'),
-    path(r'^user_delete$', views.UserDelete, name='user_delete')
+    path(r'^user_delete$', views.UserDelete, name='user_delete'),
+    path(r'^user_edit$', views.update_user, name='user_update')
 ]

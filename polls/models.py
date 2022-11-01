@@ -32,7 +32,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     password = models.CharField(max_length=200)
     email = models.EmailField(unique=True, max_length=254)
     is_staff = models.BooleanField(default=False)
-    avatar = models.ImageField(null=True, blank=True, upload_to="images/profile")
+    avatar = models.ImageField(null=True, upload_to="images/profile")
 
     USERNAME_FIELD = 'username'  # Идентификатор для обращения
     REQUIRED_FIELDS = ['email']  # Список имён полей для Superuser

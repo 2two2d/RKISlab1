@@ -8,7 +8,7 @@
         <p>{{ user.full_name }}</p>
         <p>{{ user.email }}</p>
         <div id="profile_buttons">
-            <a href="" class="profile_buttons">Изменить</a>
+            <a href="{% url 'user_update' %}" class="profile_buttons">Изменить</a>
             <a href="{% url 'user_delete' %}" class="profile_buttons">Удалить</a>
         </div>
     </div>
