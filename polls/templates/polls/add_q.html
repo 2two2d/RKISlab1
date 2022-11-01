@@ -1,0 +1,10 @@
+{% extends 'basic.html' %}
+{% block title %}Создать вопрос{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+  <form action="." method="post" id="register_form" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <p><input type="submit" value="Create question"></p>
+  </form>
+{% endblock %}

@@ -5,7 +5,7 @@
 {% block content %}
     <form action="." method="post" id="register_form" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ form|crispy }}
         <p><input type="submit" value="Create account"></p>
     </form>
 {% endblock %}

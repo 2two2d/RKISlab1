@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import EmailValidator
 from django.core.validators import RegexValidator, FileExtensionValidator
-from .models import User
+from .models import User, Question, Choice
 
 class UserRegistrationForm(forms.ModelForm):
     username = forms.CharField(label='Username', widget=forms.TextInput,
@@ -69,3 +69,20 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['avatar', 'full_name', 'username', 'email', 'password_check']
+
+class add_qForm(forms.ModelForm):
+    img = forms.ImageField(label="Pic an avatar",
+                              validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'bmp'])],
+                              required=False)
+
+    choice_text = forms.CharField(label='Вопрос', widget=forms.TextInput, required=True)
+    description = forms.CharField(label='Описание', widget=forms.TextInput, required=True)
+
+    def cleans_img(self):
+        cd = self.cleaned_data
+        if not cd['img']:
+           cd['img'] = '/images/profile/grey_avatar.png'
+        return cd['img']
+    class Meta:
+        model = Choice
+        fields = ['img', 'choice_text', 'description']
