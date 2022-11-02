@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import EmailValidator
 from django.core.validators import RegexValidator, FileExtensionValidator
-from .models import User
+from .models import User, Question, Choice
 
 class UserRegistrationForm(forms.ModelForm):
     username = forms.CharField(label='Username', widget=forms.TextInput,
@@ -41,7 +41,7 @@ class UserRegistrationForm(forms.ModelForm):
     def clean_avatar(self):
         cd = self.cleaned_data
         if not cd['avatar']:
-           cd['avatar'] = '/images/profile/grey_avatar.png'
+           cd['avatar'] = 'images/profile/grey_avatar.png'
         return cd['avatar']
 
 class UserUpdateForm(forms.ModelForm):
@@ -59,7 +59,7 @@ class UserUpdateForm(forms.ModelForm):
                               validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'bmp'])],
                               required=False)
 
-    password_check = forms.CharField(label='varify_your_password', widget=forms.PasswordInput, required=True)
+
 
     def clean_avatar(self):
         cd = self.cleaned_data
@@ -68,4 +68,26 @@ class UserUpdateForm(forms.ModelForm):
         return cd['avatar']
     class Meta:
         model = User
-        fields = ['avatar', 'full_name', 'username', 'email', 'password_check']
+        fields = ['avatar', 'full_name', 'username', 'email']
+
+class add_qForm(forms.ModelForm):
+    img = forms.ImageField(label="Pic an avatar",
+                              validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'bmp'])],
+                              required=False)
+
+    choice_text = forms.CharField(label='Вопрос', widget=forms.TextInput, required=True)
+    description = forms.CharField(label='Описание', widget=forms.TextInput, required=True)
+    num_of_questions = forms.IntegerField(label='Количество вариантов', required=True)
+
+    def clean_num_of_questions(self):
+        cd = self.cleaned_data
+        if cd['num_of_questions'] < 2 or cd['num_of_questions'] > 10:
+            raise forms.ValidationError('Число вариантов не может быть меньше 2 а также больше 10')
+        return cd['num_of_questions']
+
+    def clean_img(self):
+        cd = self.cleaned_data
+        return cd['img']
+    class Meta:
+        model = Choice
+        fields = ['img', 'choice_text', 'description']
