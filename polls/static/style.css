@@ -125,6 +125,6 @@ input[type=submit]:hover, .button:hover{
     align-items: center;
 }
 
-#questions_list_div > ul, p, div{
+#questions_list_div > ul, #questions_list_div > p, #questions_list_div > div{
     margin: 20px;
 }

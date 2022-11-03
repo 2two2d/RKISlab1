@@ -5,23 +5,26 @@ from .models import Question, Choice, User
 from django.template import loader
 from django.urls import reverse
 from django.views import generic
-from .forms import UserRegistrationForm, UserUpdateForm, add_qForm
+from .forms import UserRegistrationForm, UserUpdateForm, add_qForm, add_optionsForm
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms import formset_factory
+
+
 def register(request):
     if request.method == 'POST':
-         form = UserRegistrationForm(request.POST, request.FILES)
-         if form.is_valid():
-             new_user = form.save(commit=False)
-             new_user.set_password(form.cleaned_data['password'])
-             new_user.avatar = form.cleaned_data['avatar']
-             new_user.save()
-             return render(request, 'usermanagment/register_done.html', {'new_user':new_user})
+        form = UserRegistrationForm(request.POST, request.FILES)
+        if form.is_valid():
+            new_user = form.save(commit=False)
+            new_user.set_password(form.cleaned_data['password'])
+            new_user.avatar = form.cleaned_data['avatar']
+            new_user.save()
+            return render(request, 'usermanagment/register_done.html', {'new_user': new_user})
     else:
-         form = UserRegistrationForm()
+        form = UserRegistrationForm()
 
-    return render(request, 'usermanagment/register.html', {'form':form})
+    return render(request, 'usermanagment/register.html', {'form': form})
+
 
 def update_user(request):
     current_user = request.user
@@ -32,7 +35,8 @@ def update_user(request):
             form.save()
             return render(request, 'usermanagment/update_done.html')
     else:
-        form = UserUpdateForm(initial={'avatar': request.user.avatar.url, 'full_name': request.user.full_name, 'username': request.user.username, 'email': request.user.email})
+        form = UserUpdateForm(initial={'avatar': request.user.avatar.url, 'full_name': request.user.full_name,
+                                       'username': request.user.username, 'email': request.user.email})
     return render(request, 'usermanagment/user_update.html', {'form': form})
 
 
@@ -40,34 +44,51 @@ def update_user(request):
 def my_profile(request):
     current_user = request.user
     return render(request, 'usermanagment/my_profile.html', {'user': current_user})
+
+
 @login_required
 def UserDelete(request):
     request.user.delete()
     return render(request, 'usermanagment/user_deleted.html')
 
+
 def all_q(request):
     questions = Question.objects.all()
 
-    return render(request, 'polls/all_q.html', context={'questions':questions})
+    return render(request, 'polls/all_q.html', context={'questions': questions})
+
 
 def my_q(request):
     questions = Question.objects.all()
 
-    return render(request, 'polls/my_q.html', context={'questions':questions})
+    return render(request, 'polls/my_q.html', context={'questions': questions})
+
 
 def add_q(request):
     if request.method == 'POST':
         form = add_qForm(request.POST, request.FILES)
         if form.is_valid():
-            choice = form.save(commit=False)
-            choice.author = request.user
-            choice.img = form.cleaned_data['img']
-            choice.save()
-            return render(request, reverse_lazy('my_q'), {'latest_question_list'})
+            new_Question = form.save(commit=False)
+            new_Question.author = request.user
+            new_Question.img = form.cleaned_data['img']
+            new_Question.save()
+            pk = new_Question.id
+            return HttpResponseRedirect(reverse('add_options', args=(pk,)))
     else:
         form = add_qForm()
 
-    return render(request, 'polls/add_q.html', {'form':form})
+    return render(request, 'polls/add_q.html', {'form': form})
+
+
+def add_options(request, pk):
+    # if request.method == 'POST':
+    #     form = add_optionsForm(request.POST)
+    #     if form.is_valid():
+    #         option = form.save(commit=False)
+    #         option
+    # else:
+    formset = [add_optionsForm() for i in range(Question.object.filter(id=pk).num_of_questions)]
+    return render(request, 'polls/add_options.html', {'formset': formset})
 
 
 class DetailView(generic.DetailView):

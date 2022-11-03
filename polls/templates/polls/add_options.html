@@ -4,7 +4,9 @@
 {% block content %}
   <form action="." method="post" id="register_form" enctype="multipart/form-data">
     {% csrf_token %}
+    {% for form in formset %}
     {{ form.as_p }}
-    <p><input type="submit" value="Add options"></p>
+    {% endfor %}
+    <p><input type="submit" value="Done"></p>
   </form>
 {% endblock %}

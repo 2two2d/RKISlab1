@@ -75,7 +75,7 @@ class add_qForm(forms.ModelForm):
                               validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'bmp'])],
                               required=False)
 
-    choice_text = forms.CharField(label='Вопрос', widget=forms.TextInput, required=True)
+    question_text = forms.CharField(label='Вопрос', widget=forms.TextInput, required=True)
     description = forms.CharField(label='Описание', widget=forms.TextInput, required=True)
     num_of_questions = forms.IntegerField(label='Количество вариантов', required=True)
 
@@ -89,5 +89,19 @@ class add_qForm(forms.ModelForm):
         cd = self.cleaned_data
         return cd['img']
     class Meta:
+        model = Question
+        fields = ['img', 'question_text', 'description', 'num_of_questions']
+
+class add_optionsForm(forms.ModelForm):
+    choice_text = forms.CharField(label='Вопрос', widget=forms.TextInput, required=True)
+
+    def clean_cjoice_text(self):
+        cd = self.cleaned_data
+        if cd['choice_text'] == False:
+            raise forms.ValidationError('Поле обязательно для заполнения')
+        return cd['choice_text']
+
+    class Meta:
         model = Choice
-        fields = ['img', 'choice_text', 'description']
+        fields = ['choice_text']
+
