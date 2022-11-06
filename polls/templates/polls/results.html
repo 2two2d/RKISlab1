@@ -1,7 +1,31 @@
-<h1>{{ question.question_text }}</h1>
-<ul>
-    {% for choice in question.choice_set.all %}
-    <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{choice.votes|pluralize}}</li>
-    {% endfor %}
-</ul>
-<a href="{% url 'polls:detail'  question.id %}">выбрать еще раз? </a>
+{% extends "basic.html" %}
+{% block title %}Результат{% endblock %}
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" href="../../../static/style.css">
+    <div id="question_card">
+        <form>
+            {% csrf_token %}
+            <div id="question_description">
+                <img src="{{ question.img.url }}" alt="img" width="150" height="150">
+                <div style="width:150px;height:150px;">
+                    <h2>{{ question.question_text }}</h2><br>
+                    <p>Описание:</p>
+                    <p>{{ question.description }}</p><br>
+                    <p>Опубликованно: </p>
+                    <p style="font-size: 12px;">{{question.pub_date}}</p>
+                </div>
+            </div>
+
+            {% if error_message %}<p><strong> {{error_message}}</strong></p>{% endif %}
+            <div id="choices_div">
+                <ul>
+                    {% for choice in question.choice_set.all %}
+                    <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{choice.votes|pluralize}} ({{choice.lestfuckinggo}}%)</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <a href="{% url 'my_q' %}" class="button">Get back</a>
+        </form>
+    </div>
+{% endblock %}

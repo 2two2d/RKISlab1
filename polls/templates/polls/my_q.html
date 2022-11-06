@@ -1,12 +1,14 @@
 {% extends "basic.html" %}
-{% block title %}Main{% endblock %}
+{% block title %}Мои вопросы{% endblock %}
 {% block content %}
 <div id="questions_list_div">
-    {% if latest_question_list %}
+    {% if questions %}
 
         <ul>
-            {% for question in latest_question_list %}
-            <li><a href="{% url 'polls:detail' question.id %}">{{question.question_text}}</a> </li>
+            {% for question in questions %}
+            {% if question.was_published_recently %}
+                <li><a href="{% url 'detail' question.id %}" class="question_a">Вопрос - {{question.question_text}}</a> </li>
+            {% endif %}
             {% endfor %}
         </ul>
 

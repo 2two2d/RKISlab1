@@ -95,9 +95,9 @@ class add_qForm(forms.ModelForm):
 class add_optionsForm(forms.ModelForm):
     choice_text = forms.CharField(label='Вопрос', widget=forms.TextInput, required=True)
 
-    def clean_cjoice_text(self):
+    def clean_choice_text(self):
         cd = self.cleaned_data
-        if cd['choice_text'] == False:
+        if not cd['choice_text']:
             raise forms.ValidationError('Поле обязательно для заполнения')
         return cd['choice_text']
 

@@ -2,11 +2,12 @@
 {% block title %}Создать вопрос{% endblock %}
 {% load crispy_forms_tags %}
 {% block content %}
-  <form action="." method="post" id="register_form" enctype="multipart/form-data">
+  <form action="." method="post" id="register_form">
     {% csrf_token %}
     {% for form in formset %}
     {{ form.as_p }}
     {% endfor %}
     <p><input type="submit" value="Done"></p>
+    <input type="text" name="Qid" value="{{Qid}}" style="display:none;">
   </form>
 {% endblock %}

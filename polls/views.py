@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
 
 
+
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, request.FILES)
@@ -59,36 +60,36 @@ def all_q(request):
 
 
 def my_q(request):
-    questions = Question.objects.all()
+    questions = Question.objects.filter(author=request.user)
 
     return render(request, 'polls/my_q.html', context={'questions': questions})
 
 
 def add_q(request):
     if request.method == 'POST':
-        form = add_qForm(request.POST, request.FILES)
-        if form.is_valid():
-            new_Question = form.save(commit=False)
-            new_Question.author = request.user
-            new_Question.img = form.cleaned_data['img']
-            new_Question.save()
-            pk = new_Question.id
-            return HttpResponseRedirect(reverse('add_options', args=(pk,)))
+        if 'AddQuestionsBtn' in request.POST:
+            form = add_qForm(request.POST, request.FILES)
+            if form.is_valid():
+                new_Question = form.save(commit=False)
+                new_Question.author = request.user
+                new_Question.img = form.cleaned_data['img']
+                new_Question.save()
+                formset = [add_optionsForm() for i in range(new_Question.num_of_questions)]
+                return render(request, 'polls/add_options.html', {'formset': formset, 'Qid': new_Question.id})
+        else:
+            for i in range(Question.objects.get(id=request.POST['Qid']).num_of_questions):
+                form = add_optionsForm({'choice_text':request.POST.getlist('choice_text')[i]})
+                if form.is_valid():
+                    print(request.POST)
+                    new_Choice = form.save(commit=False)
+                    new_Choice.question = Question.objects.get(id=request.POST['Qid'])
+                    new_Choice.save()
+
+            return HttpResponseRedirect(reverse('my_q'))
+
     else:
         form = add_qForm()
-
-    return render(request, 'polls/add_q.html', {'form': form})
-
-
-def add_options(request, pk):
-    # if request.method == 'POST':
-    #     form = add_optionsForm(request.POST)
-    #     if form.is_valid():
-    #         option = form.save(commit=False)
-    #         option
-    # else:
-    formset = [add_optionsForm() for i in range(Question.object.filter(id=pk).num_of_questions)]
-    return render(request, 'polls/add_options.html', {'formset': formset})
+        return render(request, 'polls/add_q.html', {'form': form})
 
 
 class DetailView(generic.DetailView):
@@ -102,15 +103,26 @@ class ResultsView(generic.DetailView):
 
 
 def vote(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    try:
-        selected_choice = question.choice_set.get(pk=request.POST['choice'])
-    except (KeyError, Choice.DoesNotExist):
-        return render(request, 'polls/detail.html', {
-            'question': question,
-            'error_message': 'вы не сделали выбор'
-        })
+
+    if Question.objects.filter(id = question_id,voted_by=request.user):
+        return render(request, 'errors/vote_error.html')
     else:
-        selected_choice.votes += 1
-        selected_choice.save()
-        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+
+        question = get_object_or_404(Question, pk=question_id)
+
+        try:
+            selected_choice = question.choice_set.get(pk=request.POST['choice'])
+        except (KeyError, Choice.DoesNotExist):
+            return render(request, 'polls/detail.html', {
+                'question': question,
+                'error_message': 'вы не сделали выбор'
+            })
+        else:
+            current_q = Question.objects.get(id=question_id)
+            current_q.voted_by.add(request.user)
+            current_q.votes += 1
+            current_q.save()
+            selected_choice.votes += 1
+            selected_choice.save()
+            return HttpResponseRedirect(reverse('results', args=(question.id,)))
+
