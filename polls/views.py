@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.views import LoginView
 from .models import Question, Choice, User
@@ -64,23 +64,28 @@ def my_q(request):
     return render(request, 'polls/my_q.html', context={'questions': questions})
 
 
-def add_q(request):
-    if request.method == 'POST':
-        form = add_qForm(request.POST, request.FILES)
-        if form.is_valid():
-            new_Question = form.save(commit=False)
-            new_Question.author = request.user
-            new_Question.img = form.cleaned_data['img']
-            new_Question.save()
-            pk = new_Question.id
-            return HttpResponseRedirect(reverse('add_options', args=(pk,)))
-    else:
-        form = add_qForm()
+# def add_q(request):
+#     if request.method == 'POST':
+#         form = add_qForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             new_Question = form.save(commit=False)
+#             new_Question.author = request.user
+#             new_Question.img = form.cleaned_data['img']
+#             new_Question.save()
+#
+#             return redirect(reverse('add_options', args=(new_Question.id)))
+#     else:
+#         form = add_qForm()
+#
+#     return render(request, 'polls/add_q.html', {'form': form})
 
-    return render(request, 'polls/add_q.html', {'form': form})
+class AddQ(generic.CreateView):
+    form_class = add_qForm
+    template_name = 'polls/add_q.html'
+    success_url = reverse_lazy('add_options')
 
 
-def add_options(request, pk):
+def add_options(request):
     # if request.method == 'POST':
     #     form = add_optionsForm(request.POST)
     #     if form.is_valid():

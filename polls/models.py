@@ -6,8 +6,6 @@ from django.contrib.auth.models import UserManager
 from datetime import datetime
 
 
-
-
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True, unique=True)
     full_name = models.CharField(max_length=50, help_text="Напишите ФИО")
@@ -25,6 +23,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
+
 class Question(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     question_text = models.CharField(max_length=200)
@@ -33,19 +32,18 @@ class Question(models.Model):
     description = models.TextField(max_length=600, null=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     num_of_questions = models.IntegerField(null=False, default=2)
+
     def was_published_recently(self):
         return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
 
     def __str__(self):
         return self.question_text
 
+
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200, null=True,)
+    choice_text = models.CharField(max_length=200, null=True, )
     votes = models.IntegerField(default=0)
-
 
     def __str__(self):
         return self.choice_text
-
-
